@@ -1,0 +1,286 @@
+# Project Structure Overview
+# Generated: 2025-09-24
+
+[project]
+name = "unified-knowledge-platform"
+type = "monorepo"
+architecture = "event-driven-hexagonal"
+language_primary = "TypeScript"
+package_manager = "npm"
+node_version = "20.19.3"
+
+[monorepo]
+strategy = "npm-workspaces"
+apps_directory = "apps/"
+shared_configs = true
+cascading_configs = true
+
+# =============================================================================
+# REPOSITORY STRUCTURE
+# =============================================================================
+
+[structure]
+root = "/"
+
+  [structure.root_files]
+  package_json = { type = "monorepo-root", workspaces = ["apps/*"] }
+  tsconfig_base_json = { type = "shared-config", extends = "none", strict = "ultra" }
+  tsconfig_json = { type = "eslint-helper", extends = "tsconfig.base.json", noEmit = true }
+  eslint_config_mjs = { type = "shared-config", api = "project-service-v8" }
+  prettierrc = { type = "shared-config", format = "json" }
+  editorconfig = { type = "shared-config", cross_platform = true }
+  gitignore = { type = "security", protects = "secrets,env,keys,uploads" }
+  readme_md = { type = "documentation", purpose = "quick-start" }
+
+  [structure.directories]
+  apps = { type = "monorepo-apps", pattern = "apps/*" }
+  dev_docs = { type = "documentation", comprehensive = true }
+
+# =============================================================================
+# APPLICATIONS
+# =============================================================================
+
+[apps]
+
+  [apps.backend]
+  path = "apps/backend/"
+  type = "api-server"
+  framework = "NestJS 11+"
+  language = "TypeScript"
+  port = 8000
+
+    [apps.backend.config]
+    tsconfig = { extends = "../../tsconfig.base.json", composite = true }
+    eslint = { inherits = "root-config" }
+    architecture = "hexagonal"
+
+    [apps.backend.dependencies]
+    runtime = ["@nestjs/core", "@nestjs/common", "reflect-metadata"]
+    dev = ["@nestjs/cli", "@nestjs/testing", "jest"]
+
+    [apps.backend.structure]
+    src = { pattern = "bounded-contexts", layers = ["domain", "application", "infrastructure"] }
+    test = { e2e = true, unit = true }
+
+  [apps.frontend]
+  path = "apps/frontend/"
+  type = "web-application"
+  framework = "Next.js 15"
+  language = "TypeScript + React"
+  port = 3000
+
+    [apps.frontend.config]
+    tsconfig = { extends = "../../tsconfig.base.json", composite = false, jsx = "preserve", noEmit = true }
+    eslint = { inherits = "root-config" }
+    tailwind = true
+    note = "composite = false due to noEmit conflict in Next.js apps"
+
+    [apps.frontend.dependencies]
+    runtime = ["react", "react-dom", "next"]
+    dev = ["@types/react", "@types/react-dom", "typescript"]
+
+    [apps.frontend.features]
+    pwa = { enabled = true, offline_support = true }
+    mobile = { responsive = true, touch_optimized = true }
+
+# =============================================================================
+# CONFIGURATION CASCADE
+# =============================================================================
+
+[configuration]
+
+  [configuration.typescript]
+  strategy = "cascade-from-base"
+  strictness = "ultra"
+  emit_strategy = "app-specific"
+  reviewed_and_fixed = "2025-09-24"
+
+    [configuration.typescript.base]
+    file = "tsconfig.base.json"
+    target = "ES2022"
+    strict = true
+    additional_strict = [
+      "noUncheckedIndexedAccess",
+      "exactOptionalPropertyTypes",
+      "noPropertyAccessFromIndexSignature"
+    ]
+    # FIXED: No emit settings in base (prevents noEmit conflicts)
+    emit_settings = "none"
+    module_system = "app-specific"
+    path_aliases = "app-specific"
+    shared_directory = false
+
+    [configuration.typescript.apps]
+    backend = {
+      extends_base = true,
+      module = "Node16",
+      moduleResolution = "node16",
+      emit = true,
+      declaration = true,
+      composite = true,
+      conflicts_resolved = true
+    }
+    frontend = {
+      extends_base = true,
+      module = "esnext",
+      moduleResolution = "bundler",
+      noEmit = true,
+      jsx = "preserve",
+      # NOTE: composite = false (conflicts with noEmit in Next.js apps)
+      composite = false,
+      conflicts_resolved = true
+    }
+
+  [configuration.eslint]
+  strategy = "single-config-root"
+  api = "project-service-v8"
+  strictness = "ultra"
+  reviewed_and_fixed = "2025-09-24"
+
+    [configuration.eslint.rules]
+    complexity = { max = 8 }
+    function_length = { max = 30 }
+    parameters = { max = 4 }
+    nesting_depth = { max = 4 }
+    magic_numbers = "forbidden"
+    any_type = "forbidden"
+
+    [configuration.eslint.features]
+    typescript_strict = true
+    import_order = true
+    prefer_arrow_functions = true
+    no_floating_promises = true
+    # FIXED: Added missing integrations
+    jest_globals = true
+    typescript_path_resolver = true
+
+    [configuration.eslint.dependencies]
+    core = ["eslint", "@typescript-eslint/eslint-plugin", "@typescript-eslint/parser"]
+    plugins = ["eslint-plugin-import", "eslint-plugin-jest", "eslint-plugin-prefer-arrow"]
+    resolvers = ["eslint-import-resolver-typescript"]
+    globals = ["globals"]
+
+  [configuration.prettier]
+  single_quotes = true
+  trailing_commas = "all"
+  print_width = 100
+  tab_width = 2
+  semicolons = true
+
+# =============================================================================
+# DEVELOPMENT WORKFLOW
+# =============================================================================
+
+[development]
+
+  [development.quality_gates]
+  lint = { command = "eslint . --ext .ts,.tsx --max-warnings 0", required = true }
+  typecheck = { command = "npm run typecheck --workspaces", required = true }
+  test_unit = { command = "npm run test --workspaces", required = true }
+  test_e2e = { command = "npm run test:e2e --workspaces", required = true }
+  format_check = { command = "prettier --check", required = true }
+
+  [development.scripts]
+  dev = "concurrently backend+frontend"
+  build = "build all workspaces"
+  test = "test all workspaces"
+  quality = "lint + typecheck + test"
+  clean = "remove dist/build/.next"
+
+  [development.architecture_enforcement]
+  bounded_contexts = { isolation = "strict", communication = "events-only" }
+  dependency_direction = "inward-only"
+  complexity_limits = "enforced-by-eslint"
+  naming_conventions = { interfaces = "I-prefix", enums = "UPPER_CASE" }
+
+# =============================================================================
+# PLANNED INFRASTRUCTURE
+# =============================================================================
+
+[infrastructure]
+deployment = "docker-compose"
+environment = "self-hosted"
+orchestration = "simple"
+
+  [infrastructure.services]
+  database = { type = "PostgreSQL", version = "15+", extensions = ["pgvector"] }
+  cache = { type = "Redis", version = "7+", features = ["streams", "cache"] }
+  storage = { type = "local-filesystem", path = "/app/data/files" }
+
+  [infrastructure.external_apis]
+  twilio = { purpose = "SMS/Voice", optional = true }
+  sendgrid = { purpose = "Email", optional = true }
+  google_calendar = { purpose = "Calendar sync", optional = true }
+  home_assistant = { purpose = "Smart home", optional = true }
+
+# =============================================================================
+# DOCUMENTATION
+# =============================================================================
+
+[documentation]
+location = "dev-docs/"
+strategy = "minimal-focused"
+
+  [documentation.files]
+  prd = { file = "PRD.md", purpose = "product-requirements", comprehensive = true }
+  architecture = { file = "ARCHITECTURE.md", purpose = "code-organization", strict_rules = true }
+  deployment = { file = "DEPLOYMENT.md", purpose = "docker-operations" }
+
+    [documentation.decisions]
+    format = "ADR"
+    location = "dev-docs/adr/"
+    current = ["ADR-001-Technology-Stack.md"]
+
+    [documentation.features]
+    location = "dev-docs/features/"
+    specs = ["management-script.md"]
+    diagrams = ["management-script-architecture.ascii"]
+
+# =============================================================================
+# SECURITY & QUALITY
+# =============================================================================
+
+[security]
+sensitive_files_protected = true
+gitignore_comprehensive = true
+
+  [security.protected_patterns]
+  environment = [".env*", "!.env.example"]
+  credentials = ["*.pem", "*.key", "*.crt", "credentials.json"]
+  uploads = ["uploads/", "user-data/", "files/"]
+  backups = ["*.sql", "*.dump", "backups/"]
+  secrets = ["secrets/", "*.secret"]
+
+[quality]
+zero_tolerance = true
+ai_agent_ready = true
+
+  [quality.standards]
+  typescript_strictness = "maximum"
+  eslint_warnings = 0
+  complexity_limit = 8
+  function_length_limit = 30
+  test_coverage_required = true
+
+  [quality.enforcement]
+  pre_commit_hooks = "planned"
+  ci_quality_gates = "planned"
+  automated_validation = true
+
+# =============================================================================
+# FUTURE APPLICATIONS
+# =============================================================================
+
+[future_apps]
+
+  [future_apps.ai_services]
+  path = "apps/ai-services/"
+  type = "python-microservices"
+  purpose = "OCR, Voice, LLM processing"
+  language = "Python 3.12+"
+
+  [future_apps.management_script]
+  path = "app"
+  type = "bash-utility"
+  purpose = "single-entry-point for all operations"
+  commands = "30+ lifecycle/dev/db/generation operations"
