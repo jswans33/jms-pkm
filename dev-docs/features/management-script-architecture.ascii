@@ -1,0 +1,195 @@
+Management Script Architecture
+============================
+
+./app Command Flow
+==================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              ./app [command]                               │
+└─────────────────┬───────────────────────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        Command Router & Validator                          │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐            │
+│  │   Environment   │  │      Help       │  │   Validation    │            │
+│  │   Detection     │  │     System      │  │   & Parsing     │            │
+│  │  (dev/prod)     │  │                 │  │                 │            │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘            │
+└─────────────────┬───────────────────────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           Command Categories                               │
+│                                                                             │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐            │
+│  │   Lifecycle     │  │   Development   │  │    Database     │            │
+│  │   Management    │  │    Workflow     │  │   Operations    │            │
+│  │                 │  │                 │  │                 │            │
+│  │ • start         │  │ • install       │  │ • migrate       │            │
+│  │ • stop          │  │ • dev           │  │ • seed          │            │
+│  │ • restart       │  │ • test          │  │ • backup        │            │
+│  │ • status        │  │ • lint          │  │ • restore       │            │
+│  │ • logs          │  │ • typecheck     │  │ • console       │            │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘            │
+│                                                                             │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐            │
+│  │ Code Generation │  │   Production    │  │   Utilities     │            │
+│  │  (NestJS CLI)   │  │   Operations    │  │      &          │            │
+│  │                 │  │                 │  │ Troubleshooting │            │
+│  │ • generate:     │  │ • deploy        │  │ • clean         │            │
+│  │   module        │  │ • build         │  │ • reset         │            │
+│  │ • generate:     │  │ • health        │  │ • doctor        │            │
+│  │   entity        │  │ • backup        │  │ • shell         │            │
+│  │ • generate:     │  │ • update        │  │                 │            │
+│  │   handler       │  │                 │  │                 │            │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘            │
+└─────────────────┬───────────────────────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        Execution Layer                                     │
+│                                                                             │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐            │
+│  │  Docker Compose │  │   npm Scripts   │  │   System Tools  │            │
+│  │                 │  │                 │  │                 │            │
+│  │ • up/down       │  │ • install       │  │ • pg_dump       │            │
+│  │ • logs          │  │ • test          │  │ • git           │            │
+│  │ • ps/stats      │  │ • lint          │  │ • tar/rsync     │            │
+│  │ • exec          │  │ • typecheck     │  │ • curl          │            │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘            │
+│                                                                             │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐            │
+│  │   NestJS CLI    │  │   PostgreSQL    │  │    File Ops     │            │
+│  │                 │  │                 │  │                 │            │
+│  │ • nest generate │  │ • migrations    │  │ • backup files  │            │
+│  │ • module        │  │ • psql console  │  │ • log rotation  │            │
+│  │ • service       │  │ • pg_restore    │  │ • cleanup       │            │
+│  │ • controller    │  │                 │  │                 │            │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘            │
+└─────────────────┬───────────────────────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          Output & Feedback                                 │
+│                                                                             │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐            │
+│  │ Colored Output  │  │ Progress Bars   │  │ Error Handling  │            │
+│  │                 │  │                 │  │                 │            │
+│  │ • Success (✓)   │  │ • Long ops      │  │ • Clear msgs    │            │
+│  │ • Warning (⚠)   │  │ • Docker pulls  │  │ • Exit codes    │            │
+│  │ • Error (✗)     │  │ • DB migrations │  │ • Suggestions   │            │
+│  │ • Info (ℹ)      │  │ • Test runs     │  │ • Help context  │            │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+Error Flow Diagram
+==================
+
+┌─────────────────┐
+│   Command       │
+│   Execution     │
+└─────┬───────────┘
+      │
+      ▼
+┌─────────────────┐    ┌─────────────────┐
+│   Error?        │───▶│   Success       │
+│                 │    │   Exit 0        │
+└─────┬───────────┘    └─────────────────┘
+      │ Yes
+      ▼
+┌─────────────────┐
+│  Trap Handler   │
+│  (line number   │
+│   + exit code)  │
+└─────┬───────────┘
+      │
+      ▼
+┌─────────────────┐
+│ Error Analysis  │
+│                 │
+│ • Exit code 125 │──▶ Docker daemon not running
+│ • Exit code 127 │──▶ Command not found
+│ • Exit code 1   │──▶ General failure
+│ • Other         │──▶ Unexpected error
+└─────┬───────────┘
+      │
+      ▼
+┌─────────────────┐
+│ Contextual Help │
+│                 │
+│ • Suggest fix   │
+│ • Run doctor    │
+│ • Check logs    │
+│ • Retry command │
+└─────┬───────────┘
+      │
+      ▼
+┌─────────────────┐
+│   Exit with     │
+│   error code    │
+└─────────────────┘
+
+
+File Structure Map
+==================
+
+project-root/
+│
+├── app                           # Main script entry point
+│   │
+│   ├── Command Router            # Parse and validate commands
+│   ├── Environment Detection     # Development vs Production
+│   ├── Help System              # Built-in documentation
+│   ├── Error Handler            # Trap errors, provide context
+│   │
+│   ├── Lifecycle Functions       # start, stop, restart, status, logs
+│   ├── Development Functions     # install, dev, test, lint, quality
+│   ├── Database Functions        # migrate, seed, backup, restore
+│   ├── Generation Functions      # NestJS CLI integration
+│   ├── Production Functions      # deploy, build, health, update
+│   └── Utility Functions         # clean, reset, doctor, shell
+│
+├── docker-compose.yml            # Production configuration
+├── docker-compose.dev.yml        # Development overrides
+├── package.json                  # Node.js dependencies & scripts
+│
+└── dev-docs/features/
+    ├── management-script.md      # Feature specification
+    └── management-script-architecture.ascii  # This diagram
+
+
+Command Dependencies
+====================
+
+                     ┌─────────────────┐
+                     │   Environment   │
+                     │   Detection     │
+                     └─────┬───────────┘
+                           │
+              ┌────────────┼────────────┐
+              │            │            │
+              ▼            ▼            ▼
+    ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+    │   Docker    │ │  Node.js    │ │ PostgreSQL  │
+    │   Required  │ │  Required   │ │  Required   │
+    │             │ │             │ │             │
+    │ • start     │ │ • install   │ │ • db:*      │
+    │ • stop      │ │ • dev       │ │ commands    │
+    │ • logs      │ │ • test      │ │             │
+    │ • shell     │ │ • lint      │ │             │
+    └─────────────┘ └─────────────┘ └─────────────┘
+              │            │            │
+              └────────────┼────────────┘
+                           │
+                           ▼
+                ┌─────────────────┐
+                │  All Systems    │
+                │    Ready        │
+                │                 │
+                │ • Full stack    │
+                │   operations    │
+                │ • Quality gates │
+                │ • Deployments   │
+                └─────────────────┘

@@ -1,0 +1,158 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+jspm_packages/
+*/node_modules/
+
+# Build outputs
+dist/
+build/
+out/
+*/dist/
+*/build/
+*/out/
+
+# Environment and configuration files (SENSITIVE)
+.env
+.env.*
+!.env.example
+config/local.json
+config/production.json
+apps/*/.env
+apps/*/.env.*
+
+# Database files and backups (SENSITIVE)
+*.sqlite
+*.sqlite3
+*.db
+*.sql
+database/
+backups/
+*.dump
+pgdata/
+
+# Logs and runtime data
+logs/
+*.log
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+*/coverage/
+.nyc_output/
+test-results/
+junit.xml
+
+# TypeScript
+*.tsbuildinfo
+.tscache/
+
+# Next.js (future frontend)
+.next/
+out/
+apps/frontend/.next/
+apps/frontend/out/
+
+# Temporary and cache directories
+.cache/
+.tmp/
+tmp/
+temp/
+*.tmp
+*.temp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Redis dumps and logs
+dump.rdb
+redis.log
+
+# AI model files and data (can be large)
+models/
+*.model
+*.bin
+ollama/
+whisper/
+*.onnx
+
+# File uploads and user data (SENSITIVE)
+uploads/
+user-data/
+files/
+storage/
+data/files/
+
+# SSL certificates and keys (SENSITIVE)
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+certs/
+ssl/
+
+# Backup files
+*.backup
+*.bak
+backup/
+
+# Application specific
+app.log
+error.log
+access.log
+combined.log
+
+# Python (for AI services)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# API keys and secrets (SENSITIVE)
+secrets/
+*.secret
+api-keys.json
+credentials.json
+
+# Local development overrides
+docker-compose.local.yml
+local.yml
