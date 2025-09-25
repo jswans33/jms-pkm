@@ -55,6 +55,37 @@ run_quality_check() {
   echo "[orchestrate] Quality checks passed"
 }
 
+ensure_backend_dist() {
+  local dist_entry="apps/backend/dist/main.js"
+  local build_info="apps/backend/tsconfig.build.tsbuildinfo"
+  local dist_dir="apps/backend/dist"
+
+  if [[ -f "$dist_entry" ]]; then
+    return
+  fi
+
+  echo "[orchestrate] Backend dist missing; building backend workspace..."
+  if [[ -d "$dist_dir" ]]; then
+    if ! rm -rf "$dist_dir"; then
+      echo "[orchestrate] Local cleanup failed; trying to remove dist via backend container" >&2
+      docker compose run --rm backend sh -c 'rm -rf /app/apps/backend/dist' >/dev/null 2>&1 || true
+      rm -rf "$dist_dir" || true
+    fi
+  fi
+  if [[ -f "$build_info" ]]; then
+    rm -f "$build_info"
+  fi
+  npm run build --workspace backend
+  if [[ ! -f "$dist_entry" ]]; then
+    echo "[orchestrate] Backend build did not produce ${dist_entry}; check Nest/TS config." >&2
+    exit 1
+  fi
+  if [[ -f "$build_info" ]]; then
+    rm -f "$build_info"
+  fi
+  echo "[orchestrate] Backend build complete"
+}
+
 check_port_free() {
   local port=$1
   local label=$2
@@ -200,6 +231,8 @@ if [[ "$primary_command" == "up" ]]; then
   else
     echo "[orchestrate] Skipping quality checks per flag"
   fi
+
+  ensure_backend_dist
 
   if [[ "$skip_port_check" == false ]]; then
     check_port_free "${BACKEND_HOST_PORT:-4001}" "backend"

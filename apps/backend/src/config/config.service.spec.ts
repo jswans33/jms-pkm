@@ -1,3 +1,5 @@
+import { ConfigService } from '@nestjs/config';
+
 import { ApplicationConfigService } from './config.service';
 import type { Environment } from './environments';
 import type { IConfiguration } from './interfaces/configuration.interface';
@@ -42,8 +44,11 @@ describe('ApplicationConfigService', () => {
     };
 
     const getOrThrow = jest.fn(<K extends keyof IConfiguration>(key: K) => merged[key]);
+    const configService = {
+      getOrThrow,
+    } as unknown as ConfigService<IConfiguration, true>;
 
-    return new ApplicationConfigService({ getOrThrow });
+    return new ApplicationConfigService(configService);
   };
 
   it('exposes strongly typed configuration sections', () => {

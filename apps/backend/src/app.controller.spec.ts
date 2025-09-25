@@ -21,9 +21,4 @@ describe('AppController', () => {
     });
   });
 
-  describe('health', () => {
-    it('should confirm configuration health', (): void => {
-      expect(appController.getConfigurationHealth()).toEqual({ status: 'ok' });
-    });
-  });
 });

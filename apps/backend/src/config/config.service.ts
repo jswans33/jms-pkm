@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import type { IAppConfig } from './interfaces/app.config';
@@ -7,28 +7,37 @@ import type { IDatabaseConfig } from './interfaces/database.config';
 import type { IRedisConfig } from './interfaces/redis.config';
 import type { ISecurityConfig } from './interfaces/security.config';
 
+interface IReadonlyConfigService {
+  readonly getOrThrow: <K extends keyof IConfiguration>(key: K) => IConfiguration[K];
+}
+
 type ConfigReader = Readonly<Pick<ConfigService<IConfiguration, true>, 'getOrThrow'>>;
 
 @Injectable()
 export class ApplicationConfigService {
+  private readonly configReader: ConfigReader;
+
   public constructor(
-    private readonly configService: ConfigReader,
-  ) {}
+    @Inject(ConfigService)
+    configService: IReadonlyConfigService,
+  ) {
+    this.configReader = configService;
+  }
 
   public get app(): IAppConfig {
-    return this.configService.getOrThrow('app');
+    return this.configReader.getOrThrow('app');
   }
 
   public get database(): IDatabaseConfig {
-    return this.configService.getOrThrow('database');
+    return this.configReader.getOrThrow('database');
   }
 
   public get redis(): IRedisConfig {
-    return this.configService.getOrThrow('redis');
+    return this.configReader.getOrThrow('redis');
   }
 
   public get security(): ISecurityConfig {
-    return this.configService.getOrThrow('security');
+    return this.configReader.getOrThrow('security');
   }
 
   public isProduction(): boolean {

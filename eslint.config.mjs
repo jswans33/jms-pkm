@@ -16,6 +16,13 @@ const tsParserOptions = {
 };
 
 export default [
+  {
+    ignores: [
+      'node_modules',
+      'storage/**',
+      '**/dist/**',
+    ],
+  },
   js.configs.recommended,
   {
     files: ['**/*.{ts,tsx}'],
