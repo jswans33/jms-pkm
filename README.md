@@ -77,6 +77,41 @@ Key variables to set:
 - Database: `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_NAME`, `DB_URL`
 - Redis: `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`
 - Security: `JWT_SECRET`, `SESSION_SECRET`, `API_KEY`
+- Ports: `BACKEND_HOST_PORT`, `FRONTEND_HOST_PORT`, `NGINX_HOST_PORT`, `POSTGRES_HOST_PORT`, `REDIS_HOST_PORT`
+
+## Docker Orchestration
+
+Container assets live under `docker/` (multi-stage images) and `nginx/` (routing). Use the helper scripts in `scripts/` to launch stacks with environment-specific compose overrides:
+
+```bash
+# Development (defaults to .env.development)
+scripts/dev.sh              # up -d
+
+# Alternative environments
+scripts/test.sh up          # uses .env.testing
+scripts/staging.sh up       # uses .env.staging
+scripts/prod.sh up -d       # expects a private .env.production
+
+# Pass through docker compose commands
+scripts/dev.sh logs backend
+scripts/prod.sh down
+```
+
+Compose layers:
+
+- `docker-compose.yml` – core services (Postgres, Redis, backend, frontend, nginx)
+- `docker-compose.dev.yml` – watch mode commands and developer ports
+- `docker-compose.test.yml` – testing profile without public exposure
+- `docker-compose.staging.yml` – staging host port mappings & nginx routes
+- `docker-compose.prod.yml` – production routes (supply secrets via `.env.production`)
+
+Preflight safety checks (enabled on `up`) ensure:
+
+- `npm run quality` succeeds before containers start (use `--skip-quality` to bypass)
+- Host ports defined in `.env.*` are free (`--skip-port-check` to override)
+- Existing UKP containers are reported before reusing names (`--skip-container-check`)
+
+Persistent data mounts into `storage/`. Replace the placeholder nginx configs in `nginx/conf.d/*.conf` and certificate stubs in `nginx/ssl/` when wiring external hosts.
 
 ## Documentation
 

@@ -35,6 +35,10 @@ config/local.json
 config/production.json
 apps/*/.env
 apps/*/.env.*
+storage/*
+!storage/.gitkeep
+nginx/ssl/*
+!nginx/ssl/.gitkeep
 
 # Database files and backups (SENSITIVE)
 *.sqlite
