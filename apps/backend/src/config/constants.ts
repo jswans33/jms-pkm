@@ -1,0 +1,16 @@
+export const DEFAULT_APP_NAME = 'unified-knowledge-backend';
+export const DEFAULT_API_PREFIX = 'api';
+export const DEVELOPMENT_APP_PORT = 3000;
+export const DEV_CONTAINER_APP_PORT = 3000;
+export const TEST_APP_PORT = 3001;
+export const STAGING_APP_PORT = 4000;
+export const PRODUCTION_APP_PORT = 8080;
+export const DATABASE_DEFAULT_PORT = 5432;
+export const REDIS_DEFAULT_PORT = 6379;
+export const PORT_MIN = 0;
+export const PORT_MAX = 65535;
+export const DEFAULT_LOG_LEVEL = 'info';
+export const DEFAULT_LOG_FORMAT = 'pretty';
+export const DEFAULT_SESSION_SECRET = 'dev-session-secret-change-me';
+export const DEFAULT_JWT_SECRET = 'dev-jwt-secret-change-me';
+export const SECRET_MIN_LENGTH = 16;

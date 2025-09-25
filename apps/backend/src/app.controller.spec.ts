@@ -20,4 +20,10 @@ describe('AppController', () => {
       expect(appController.getHello()).toBe('Hello World!');
     });
   });
+
+  describe('health', () => {
+    it('should confirm configuration health', (): void => {
+      expect(appController.getConfigurationHealth()).toEqual({ status: 'ok' });
+    });
+  });
 });

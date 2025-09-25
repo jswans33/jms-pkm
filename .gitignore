@@ -24,6 +24,13 @@ out/
 .env
 .env.*
 !.env.example
+.env.production
+.env.local
+.env.*.local
+!.env.development
+!.env.dev-container
+!.env.testing
+!.env.staging
 config/local.json
 config/production.json
 apps/*/.env

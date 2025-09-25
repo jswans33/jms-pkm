@@ -61,10 +61,22 @@ nest generate controller <context-name>/infrastructure/<entity> --flat
 
 ## Configuration
 
-Copy `.env.example` to `.env` and configure:
-- Database connection
-- External API keys (Twilio, SendGrid)
-- JWT secrets
+Environment presets live in the repo root:
+
+- `.env.development` – default local machine values
+- `.env.dev-container` – defaults tuned for Docker development containers
+- `.env.testing` – isolated settings for automated tests
+- `.env.staging` – template for staging deployments (override secrets in CI)
+- `.env.example` – reference for creating new environment files
+
+Create a private `.env` (local) or `.env.production` (deployment) for sensitive overrides; both are gitignored.
+
+Key variables to set:
+
+- App: `NODE_ENV`, `PORT`, `API_PREFIX`, `CORS_ORIGINS`, `LOG_LEVEL`, `LOG_FORMAT`
+- Database: `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_NAME`, `DB_URL`
+- Redis: `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`
+- Security: `JWT_SECRET`, `SESSION_SECRET`, `API_KEY`
 
 ## Documentation
 

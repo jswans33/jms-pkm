@@ -2,6 +2,8 @@ import { Controller, Get } from '@nestjs/common';
 
 import { AppService } from './app.service';
 
+type HealthResponse = Readonly<{ status: 'ok' }>;
+
 @Controller()
 export class AppController {
   // NestJS DI requires the concrete type here; readonly contract is enforced via the field modifier.
@@ -11,5 +13,10 @@ export class AppController {
   @Get()
   public getHello(): string {
     return this.appService.getHello();
+  }
+
+  @Get('health/config')
+  public getConfigurationHealth(): HealthResponse {
+    return { status: 'ok' };
   }
 }
