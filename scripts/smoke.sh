@@ -109,13 +109,22 @@ health_url="http://localhost:${nginx_port}/api/health/config"
 backend_port="${BACKEND_HOST_PORT:-4001}"
 backend_health_url="http://localhost:${backend_port}/api/health/config"
 
-if ! backend_response=$(curl -fsSL "$backend_health_url" 2>/dev/null); then
-  echo "[smoke] Backend did not respond with 200 at ${backend_health_url}." >&2
-  exit 1
-fi
+backend_max_attempts=30
 
-if [[ "$backend_response" != '{"status":"ok"}' ]]; then
-  echo "[smoke] Unexpected backend response: $backend_response" >&2
+for (( attempt=1; attempt<=backend_max_attempts; attempt++ )); do
+  if backend_response=$(curl -fsSL "$backend_health_url" 2>/dev/null); then
+    if [[ "$backend_response" == '{"status":"ok"}' ]]; then
+      break
+    fi
+    echo "[smoke] Backend unexpected response: $backend_response" >&2
+  else
+    echo "[smoke] Backend attempt ${attempt}/${backend_max_attempts} failed; retrying..." >&2
+  fi
+  sleep 2
+done
+
+if [[ ${attempt:-0} -gt backend_max_attempts ]]; then
+  echo "[smoke] Backend did not respond with {\"status\":\"ok\"} after ${backend_max_attempts} attempts at ${backend_health_url}." >&2
   exit 1
 fi
 
