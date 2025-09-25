@@ -170,3 +170,5 @@ credentials.json
 # Local development overrides
 docker-compose.local.yml
 local.yml
+# Codex workflow outputs
+codex/out/

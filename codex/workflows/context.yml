@@ -1,0 +1,24 @@
+name: context
+description: Build repository context and a WHY-driven report
+sequence:
+  - id: fs
+    run: bash codex/scripts/sub-fs.sh
+  - id: parallel_discovery
+    parallel:
+      - id: search
+        run: bash codex/scripts/sub-search.sh
+      - id: stack
+        run: bash codex/scripts/sub-stack.sh
+      - id: tests
+        run: bash codex/scripts/sub-tests.sh
+      - id: docs
+        run: bash codex/scripts/sub-docs.sh
+  - id: git
+    run: bash codex/scripts/sub-git.sh
+  - id: risk
+    run: bash codex/scripts/sub-risk.sh
+  - id: compose
+    run: bash codex/scripts/compose-report.sh
+outputs:
+  - codex/out/report.md
+  - codex/out/*.json

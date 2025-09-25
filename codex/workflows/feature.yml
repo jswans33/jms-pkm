@@ -1,0 +1,20 @@
+name: feature
+description: From idea to spec, scaffold, implement, validate, and handoff
+phases:
+  - id: spec
+    prompt: feature-spec.md
+    description: Draft a short engineering spec and stop for approval
+  - id: scaffold
+    prompt: feature-scaffold.md
+    description: Create files/tests only; stop before running anything
+  - id: implement
+    prompt: feature-implement.md
+    description: Minimal diffs; stop before commands
+  - id: validate
+    prompt: feature-validate.md
+    description: Propose validation commands and gates; wait for approval
+  - id: handoff
+    prompt: feature-handoff.md
+    description: Summarize changes, risks, commands, and git status
+outputs:
+  - codex/out/feature/*.md
