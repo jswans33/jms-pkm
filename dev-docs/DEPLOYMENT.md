@@ -18,6 +18,7 @@ cp .env.example .env
 ```
 
 ### Required Variables
+
 ```env
 # Database
 DATABASE_URL=postgresql://user:pass@localhost:5432/knowledge
@@ -33,6 +34,7 @@ MAX_FILE_SIZE=50MB
 ```
 
 ### Optional External Services
+
 ```env
 # SMS/Voice (optional)
 TWILIO_SID=your-twilio-sid
@@ -55,12 +57,11 @@ HOME_ASSISTANT_TOKEN=your-long-lived-token
 ```yaml
 # docker-compose.yml structure:
 services:
-  app:          # NestJS backend (port 8000)
-  web:          # Next.js frontend (port 3000)
-  db:           # PostgreSQL with pgvector
-  redis:        # Events + cache
-  ollama:       # Local LLM (port 11434)
-  ai-services:  # Python OCR/voice processing
+  backend: # NestJS API (port 3000 inside container)
+  frontend: # Next.js application
+  postgres: # PostgreSQL 16
+  redis: # Redis 7
+  nginx: # Reverse proxy / health entrypoint
 ```
 
 ## Data Persistence
@@ -93,16 +94,26 @@ docker exec -i knowledge_db psql -U postgres knowledge < backup.sql
 # Check all services
 docker compose ps
 
-# View logs
-docker compose logs -f app
+# Backend health (direct)
+curl http://localhost:4001/api/health/config
 
-# Individual service logs
-docker compose logs ai-services
+# Proxy health (nginx)
+curl http://localhost:3080/api/health/config
+
+# Tail logs
+docker compose logs -f backend
+docker compose logs -f nginx
 ```
+
+### Automated Smoke Test
+
+- Local: run `./scripts/smoke.sh dev` to spin up the dev stack and verify `/api/health/config` end-to-end.
+- CI: `.github/workflows/ci.yml` executes the same smoke script on every push/PR and tears the stack down afterwards.
 
 ## Troubleshooting
 
 ### App won't start
+
 ```bash
 # Check environment
 docker compose config
@@ -113,6 +124,7 @@ docker compose up -d
 ```
 
 ### Database issues
+
 ```bash
 # Connect to DB
 docker exec -it knowledge_db psql -U postgres knowledge
@@ -122,6 +134,7 @@ npm run migration:show
 ```
 
 ### AI services not responding
+
 ```bash
 # Check Ollama
 curl http://localhost:11434/api/tags
@@ -133,6 +146,7 @@ docker compose restart ai-services
 ## Performance Tuning
 
 ### PostgreSQL (16GB+ servers)
+
 ```env
 # Increase shared buffers
 POSTGRES_SHARED_BUFFERS=4GB
@@ -140,6 +154,7 @@ POSTGRES_EFFECTIVE_CACHE_SIZE=12GB
 ```
 
 ### Redis Memory
+
 ```env
 # Limit Redis memory usage
 REDIS_MAXMEMORY=2GB
