@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint . --ext .ts,.tsx --max-warnings 0",
+    "lint:fix": "npm run lint -- --fix",
+    "typecheck": "node ./scripts/typecheck.mjs"
   },
   "dependencies": {
     "react": "19.1.0",

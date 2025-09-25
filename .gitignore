@@ -76,6 +76,8 @@ junit.xml
 out/
 apps/frontend/.next/
 apps/frontend/out/
+!apps/frontend/.next/types/
+!apps/frontend/.next/types/routes.d.ts
 
 # Temporary and cache directories
 .cache/

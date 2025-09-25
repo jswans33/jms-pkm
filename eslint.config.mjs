@@ -7,36 +7,38 @@ import preferArrow from 'eslint-plugin-prefer-arrow';
 import prettier from 'eslint-config-prettier';
 import globals from 'globals';
 
+const tsParserOptions = {
+  ecmaVersion: 'latest',
+  sourceType: 'module',
+  // Use new Project Service API (typescript-eslint v8+)
+  projectService: true,
+  tsconfigRootDir: import.meta.dirname,
+};
+
 export default [
   js.configs.recommended,
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       parser: typescriptParser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-        // Use new Project Service API (typescript-eslint v8+)
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
+      parserOptions: tsParserOptions,
     },
     plugins: {
       '@typescript-eslint': typescript,
-      'import': importPlugin,
-      'jest': jestPlugin,
+      import: importPlugin,
+      jest: jestPlugin,
       'prefer-arrow': preferArrow,
     },
     settings: {
       'import/resolver': {
         typescript: {
-          project: true
-        }
-      }
+          project: true,
+        },
+      },
     },
     rules: {
       // COMPLEXITY LIMITS (ULTRA STRICT)
-      'complexity': ['error', { max: 8 }],
+      complexity: ['error', { max: 8 }],
       'max-lines-per-function': ['error', { max: 30, skipComments: true, skipBlankLines: true }],
       'max-params': ['error', 4],
       'max-depth': ['error', 4],
@@ -49,41 +51,48 @@ export default [
       '@typescript-eslint/explicit-module-boundary-types': 'error',
       '@typescript-eslint/no-inferrable-types': 'off',
       '@typescript-eslint/prefer-readonly': 'error',
-      '@typescript-eslint/prefer-readonly-parameter-types': 'error',
+      '@typescript-eslint/prefer-readonly-parameter-types': [
+        'error',
+        {
+          allow: ['^Readonly<[^]*>$']
+        }
+      ],
       '@typescript-eslint/explicit-member-accessibility': 'error',
 
       // NO MAGIC NUMBERS/STRINGS
-      '@typescript-eslint/no-magic-numbers': ['error', {
-        ignoreNumericLiteralTypes: true,
-        ignoreReadonlyClassProperties: true,
-        ignoreEnums: true,
-        ignore: [0, 1, -1, 2, 10, 100, 1000]
-      }],
+      '@typescript-eslint/no-magic-numbers': [
+        'error',
+        {
+          ignoreNumericLiteralTypes: true,
+          ignoreReadonlyClassProperties: true,
+          ignoreEnums: true,
+          ignore: [0, 1, -1, 2, 10, 100, 1000],
+        },
+      ],
       'no-magic-numbers': 'off', // Use TypeScript version
 
       // PREFER MODERN PATTERNS
-      'prefer-arrow/prefer-arrow-functions': ['error', {
-        disallowPrototype: true,
-        singleReturnOnly: false,
-        classPropertiesAllowed: false
-      }],
+      'prefer-arrow/prefer-arrow-functions': [
+        'error',
+        {
+          disallowPrototype: true,
+          singleReturnOnly: false,
+          classPropertiesAllowed: false,
+        },
+      ],
       'prefer-const': 'error',
       'prefer-template': 'error',
       'no-var': 'error',
 
       // IMPORT RULES
-      'import/order': ['error', {
-        'groups': [
-          'builtin',
-          'external',
-          'internal',
-          'parent',
-          'sibling',
-          'index'
-        ],
-        'newlines-between': 'always',
-        'alphabetize': { order: 'asc', caseInsensitive: true }
-      }],
+      'import/order': [
+        'error',
+        {
+          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+          'newlines-between': 'always',
+          alphabetize: { order: 'asc', caseInsensitive: true },
+        },
+      ],
       'import/no-cycle': 'error',
       'import/no-self-import': 'error',
       'import/no-unused-modules': 'error',
@@ -95,6 +104,7 @@ export default [
       'no-eval': 'error',
       'no-implied-eval': 'error',
       'no-new-func': 'error',
+      'no-undef': 'off',
 
       // PROMISE HANDLING
       '@typescript-eslint/no-floating-promises': 'error',
@@ -106,48 +116,56 @@ export default [
         {
           selector: 'interface',
           format: ['PascalCase'],
-          prefix: ['I']
+          prefix: ['I'],
         },
         {
           selector: 'typeAlias',
-          format: ['PascalCase']
+          format: ['PascalCase'],
         },
         {
           selector: 'enum',
-          format: ['PascalCase']
+          format: ['PascalCase'],
         },
         {
           selector: 'enumMember',
-          format: ['UPPER_CASE']
+          format: ['UPPER_CASE'],
         },
         {
           selector: 'class',
-          format: ['PascalCase']
+          format: ['PascalCase'],
         },
         {
           selector: 'method',
-          format: ['camelCase']
+          format: ['camelCase'],
         },
         {
           selector: 'property',
-          format: ['camelCase', 'UPPER_CASE']
-        }
-      ]
-    }
+          format: ['camelCase', 'UPPER_CASE'],
+        },
+      ],
+    },
   },
   {
     files: ['**/*.test.ts', '**/*.spec.ts'],
     languageOptions: {
-      globals: globals.jest
+      parser: typescriptParser,
+      parserOptions: tsParserOptions,
+      globals: globals.jest,
     },
     plugins: {
-      'jest': jestPlugin
+      '@typescript-eslint': typescript,
+      jest: jestPlugin,
     },
     rules: {
       ...jestPlugin.configs.recommended.rules,
       '@typescript-eslint/no-magic-numbers': 'off',
-      'max-lines-per-function': 'off'
-    }
+      'max-lines-per-function': 'off',
+    },
+    settings: {
+      jest: {
+        version: 30,
+      },
+    },
   },
-  prettier
+  prettier,
 ];

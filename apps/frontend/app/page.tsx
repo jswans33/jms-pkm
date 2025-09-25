@@ -1,8 +1,9 @@
 import Image from "next/image";
+import type { ReactElement } from "react";
 
 type FeatureStep = Readonly<{
   description: string;
-  highlight: string;
+  highlight?: string;
 }>;
 
 type ResourceLink = Readonly<{
@@ -18,7 +19,6 @@ const FEATURE_STEPS: ReadonlyArray<FeatureStep> = [
   },
   {
     description: "Save and see your changes instantly.",
-    highlight: "",
   },
 ];
 
@@ -35,12 +35,12 @@ const RESOURCE_LINKS: ReadonlyArray<ResourceLink> = [
   },
   {
     href: "https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app",
-    label: "Go to nextjs.org →",
+    label: "Go to nextjs.org ->",
     icon: "/globe.svg",
   },
 ];
 
-const Logo = (): JSX.Element => (
+const Logo = (): ReactElement => (
   <Image
     className="dark:invert"
     src="/next.svg"
@@ -51,7 +51,7 @@ const Logo = (): JSX.Element => (
   />
 );
 
-const FeatureList = (): JSX.Element => (
+const FeatureList = (): ReactElement => (
   <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
     {FEATURE_STEPS.map((step) => (
       <li key={step.description} className="mb-2 tracking-[-.01em]">
@@ -67,7 +67,7 @@ const FeatureList = (): JSX.Element => (
   </ol>
 );
 
-const ActionLinks = (): JSX.Element => (
+const ActionLinks = (): ReactElement => (
   <div className="flex gap-4 items-center flex-col sm:flex-row">
     <a
       className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
@@ -95,7 +95,7 @@ const ActionLinks = (): JSX.Element => (
   </div>
 );
 
-const ResourceLinks = (): JSX.Element => (
+const ResourceLinks = (): ReactElement => (
   <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
     {RESOURCE_LINKS.map((link) => (
       <a
@@ -112,7 +112,7 @@ const ResourceLinks = (): JSX.Element => (
   </footer>
 );
 
-const Home = (): JSX.Element => (
+const Home = (): ReactElement => (
   <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
     <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
       <Logo />

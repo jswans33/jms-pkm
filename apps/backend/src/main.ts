@@ -8,7 +8,7 @@ const DEFAULT_PORT = 3000;
 
 const bootstrap = async (): Promise<void> => {
   const app = await NestFactory.create(AppModule);
-  const port = Number(process.env.PORT ?? DEFAULT_PORT);
+  const port = Number(process.env['PORT'] ?? DEFAULT_PORT);
 
   await app.listen(port);
 };
