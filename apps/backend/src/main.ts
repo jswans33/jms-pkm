@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
 import { ApplicationConfigService } from './config/config.service';
+import { PrismaService } from './shared/infrastructure/prisma/prisma.service';
 
 const applyCors = (app: Readonly<INestApplication>, origins: ReadonlyArray<string>): void => {
   if (origins.length === 0) {
@@ -21,6 +22,7 @@ const applyCors = (app: Readonly<INestApplication>, origins: ReadonlyArray<strin
 const bootstrap = async (): Promise<void> => {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ApplicationConfigService);
+  const prisma = app.get(PrismaService);
   const { port, apiPrefix, corsOrigins } = config.app;
 
   if (apiPrefix.length > 0) {
@@ -28,6 +30,7 @@ const bootstrap = async (): Promise<void> => {
   }
 
   applyCors(app, corsOrigins);
+  await prisma.enableShutdownHooks(app);
 
   await app.listen(port);
 };

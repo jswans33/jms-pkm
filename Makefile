@@ -37,3 +37,6 @@ feature-validate-exec:
 feature-pr:
 	bash codex/scripts/feature-pr.sh
 
+# Fast feature (workspace-write, no pauses)
+feature-fast:
+	bash codex/scripts/feature-fast.sh

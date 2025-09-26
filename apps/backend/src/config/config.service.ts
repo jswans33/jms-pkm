@@ -43,4 +43,12 @@ export class ApplicationConfigService {
   public isProduction(): boolean {
     return this.app.environment === 'production';
   }
+
+  public getDatabaseUrl(): string {
+    const db = this.database;
+    if (db.url) {
+      return db.url;
+    }
+    return `postgresql://${db.username}:${db.password}@${db.host}:${db.port}/${db.name}?schema=public`;
+  }
 }

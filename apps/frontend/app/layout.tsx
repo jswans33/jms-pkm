@@ -24,7 +24,7 @@ interface IRootLayoutProps {
 }
 
 // Next.js mandates the children prop shape; disable-readonly rule here keeps JSX ergonomic.
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+ 
 const RootLayout: (props: Readonly<IRootLayoutProps>) => ReactElement = (props) => {
   const { children } = props;
 

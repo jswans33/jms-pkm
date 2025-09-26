@@ -98,7 +98,10 @@ const buildAppConfig = (
 
 const buildDatabaseConfig = (overrides: ConfigurationOverrides): IDatabaseConfig => {
   const databaseOverrides = overrides.database ?? {};
-  const url = resolveOptionalString(process.env['DB_URL'], databaseOverrides.url);
+  const url = resolveOptionalString(
+    process.env['DATABASE_URL'] ?? process.env['DB_URL'],
+    databaseOverrides.url,
+  );
 
   return {
     host: resolveString(process.env['DB_HOST'], databaseOverrides.host, 'localhost'),

@@ -6,7 +6,8 @@
     "rootDir": "./",
     "baseUrl": "./",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@prisma/client": ["../../generated/prisma"]
     }
   },
   "include": ["src/**/*.ts", "test/**/*.ts"],

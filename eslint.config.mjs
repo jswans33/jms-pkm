@@ -18,9 +18,11 @@ const tsParserOptions = {
 export default [
   {
     ignores: [
-      'node_modules',
+      '**/node_modules/**',
       'storage/**',
       '**/dist/**',
+      '**/generated/**',
+      'generated/**',
     ],
   },
   js.configs.recommended,
@@ -58,12 +60,8 @@ export default [
       '@typescript-eslint/explicit-module-boundary-types': 'error',
       '@typescript-eslint/no-inferrable-types': 'off',
       '@typescript-eslint/prefer-readonly': 'error',
-      '@typescript-eslint/prefer-readonly-parameter-types': [
-        'error',
-        {
-          allow: ['^Readonly<[^]*>$']
-        }
-      ],
+      // Disabled: This rule is too strict for practical use with DI, external libraries, and Date objects
+      // '@typescript-eslint/prefer-readonly-parameter-types': 'error',
       '@typescript-eslint/explicit-member-accessibility': 'error',
 
       // NO MAGIC NUMBERS/STRINGS
