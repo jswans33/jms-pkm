@@ -94,8 +94,38 @@ ensure_services_running() {
   return 0
 }
 
+run_migrations() {
+  echo "[smoke] Applying database migrations via Prisma..."
+  if ! docker compose exec -T backend npx prisma migrate deploy >/tmp/prisma-migrate.log 2>&1; then
+    echo "[smoke] Prisma migrate deploy failed:" >&2
+    cat /tmp/prisma-migrate.log >&2 || true
+    return 1
+  fi
+  echo "[smoke] Prisma migrate deploy complete."
+}
+
+run_seeds() {
+  echo "[smoke] Seeding database via Prisma..."
+  if ! docker compose exec -T backend npx prisma db seed >/tmp/prisma-seed.log 2>&1; then
+    echo "[smoke] Prisma db seed failed:" >&2
+    cat /tmp/prisma-seed.log >&2 || true
+    return 1
+  fi
+  echo "[smoke] Prisma seed complete."
+}
+
 if ! ensure_services_running; then
   echo "[smoke] Aborting before health polling due to unhealthy services." >&2
+  exit 1
+fi
+
+if ! run_migrations; then
+  echo "[smoke] Aborting due to migration failure." >&2
+  exit 1
+fi
+
+if ! run_seeds; then
+  echo "[smoke] Aborting due to seeding failure." >&2
   exit 1
 fi
 

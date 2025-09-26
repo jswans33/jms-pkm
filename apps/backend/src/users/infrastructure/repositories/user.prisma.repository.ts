@@ -21,7 +21,7 @@ export class UserPrismaRepository implements IUserRepository {
     const userData = {
       email: entity.email,
       displayName: entity.displayName,
-      passwordHash: entity.passwordHash,
+      passwordHash: entity.passwordHash ?? null,
       status: entity.status,
     };
     const data = await this.prisma['user'].upsert({
@@ -50,7 +50,7 @@ export class UserPrismaRepository implements IUserRepository {
       id: new UserId(data.id),
       email: data.email,
       displayName: data.displayName,
-      passwordHash: data.passwordHash ?? undefined,
+      ...(data.passwordHash && { passwordHash: data.passwordHash }),
       status: data.status as 'active' | 'invited' | 'disabled',
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,

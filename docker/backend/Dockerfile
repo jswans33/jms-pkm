@@ -12,12 +12,18 @@ RUN npm ci --ignore-scripts
 
 FROM deps AS build
 ENV NODE_ENV=production
-COPY . .
+# Create node user and set ownership before build
+RUN chown -R node:node /app
+USER node
+COPY --chown=node:node . .
 RUN npm run build --workspace backend
 
 FROM deps AS development
 ENV NODE_ENV=development
-COPY . .
+# Set ownership and run as node user for development
+RUN chown -R node:node /app
+USER node
+COPY --chown=node:node . .
 CMD ["npm", "run", "start:dev-container", "--workspace", "backend"]
 
 FROM base AS runtime

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 
-import type { PrismaService } from './prisma.service';
+import { PrismaService } from './prisma.service';
 
 type TransactionHandler<TResult> = (tx: Prisma.TransactionClient) => Promise<TResult>;
 

@@ -15,10 +15,12 @@ export class AuditStrategyResolver {
   private activeStrategy: IAuditTrailStrategy;
 
   public constructor(
-    private readonly config: ApplicationConfigService,
+    config: ApplicationConfigService,
     consoleAuditStrategy: ConsoleAuditStrategy,
     databaseAuditStrategy: DatabaseAuditStrategy,
   ) {
+    // Will use config when we enable database strategy
+    void config;
     this.strategies.set('console', consoleAuditStrategy);
     this.strategies.set('database', databaseAuditStrategy);
 

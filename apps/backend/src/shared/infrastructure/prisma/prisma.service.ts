@@ -1,6 +1,7 @@
 import type { INestApplication } from '@nestjs/common';
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+// Force restart to pick up PORT=3001
 
 const resolveLogLevels = (): Array<'info' | 'query' | 'warn' | 'error'> => {
   if (process.env['NODE_ENV'] === 'production') {

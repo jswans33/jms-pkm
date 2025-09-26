@@ -15,4 +15,18 @@ export class HealthController {
     await this.healthService.assertDependenciesHealthy();
     return { status: 'ok' };
   }
+
+  @Get('detailed')
+  public async getDetailedHealth(): Promise<{
+    status: 'healthy' | 'degraded' | 'unhealthy';
+    dependencies: Record<string, { status: string; latency?: number; error?: string }>;
+    database: {
+      connected: boolean;
+      migrationsApplied: boolean;
+      latency?: number;
+      error?: string;
+    };
+  }> {
+    return this.healthService.getDetailedHealth();
+  }
 }

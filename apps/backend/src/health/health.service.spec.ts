@@ -5,6 +5,7 @@ import type { IAppConfig } from '../config/interfaces/app.config';
 import type { IDatabaseConfig } from '../config/interfaces/database.config';
 import type { IRedisConfig } from '../config/interfaces/redis.config';
 import type { ISecurityConfig } from '../config/interfaces/security.config';
+import type { DatabaseHealthService } from '../shared/infrastructure/database/database-health.service';
 
 import { HealthService } from './health.service';
 import type { TcpProbe } from './health.tokens';
@@ -57,9 +58,18 @@ const buildConfigService = (): ConfigServiceStub => {
 describe('HealthService', () => {
   it('confirms dependencies when all probes succeed', async () => {
     const tcpProbe: TcpProbe = jest.fn().mockResolvedValue(undefined);
+    const mockDatabaseHealth = {
+      ensureDatabaseReady: jest.fn().mockResolvedValue(undefined),
+      checkHealth: jest.fn().mockResolvedValue({
+        isConnected: true,
+        migrationsApplied: true,
+        lastChecked: new Date(),
+      }),
+    };
     const service = new HealthService(
       buildConfigService() as unknown as ApplicationConfigService,
       tcpProbe,
+      mockDatabaseHealth as unknown as DatabaseHealthService,
     );
 
     await expect(service.assertDependenciesHealthy()).resolves.toBeUndefined();
@@ -71,9 +81,18 @@ describe('HealthService', () => {
       .fn()
       .mockResolvedValueOnce(undefined)
       .mockRejectedValueOnce(new Error('redis unreachable'));
+    const mockDatabaseHealth = {
+      ensureDatabaseReady: jest.fn().mockResolvedValue(undefined),
+      checkHealth: jest.fn().mockResolvedValue({
+        isConnected: true,
+        migrationsApplied: true,
+        lastChecked: new Date(),
+      }),
+    };
     const service = new HealthService(
       buildConfigService() as unknown as ApplicationConfigService,
       tcpProbe,
+      mockDatabaseHealth as unknown as DatabaseHealthService,
     );
 
     await expect(service.assertDependenciesHealthy()).rejects.toBeInstanceOf(

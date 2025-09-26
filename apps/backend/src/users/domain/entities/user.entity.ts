@@ -10,11 +10,17 @@ export interface IUserProps {
   readonly updatedAt: Date;
 }
 
+const cloneDate = (date: Date): Date => new Date(date.getTime());
+
 export class User {
   private constructor(private readonly props: IUserProps) {}
 
   public static create(props: IUserProps): User {
-    return new User(props);
+    return new User({
+      ...props,
+      createdAt: cloneDate(props.createdAt),
+      updatedAt: cloneDate(props.updatedAt),
+    });
   }
 
   public get id(): UserId {
@@ -38,18 +44,33 @@ export class User {
   }
 
   public get createdAt(): Date {
-    return this.props.createdAt;
+    return cloneDate(this.props.createdAt);
   }
 
   public get updatedAt(): Date {
-    return this.props.updatedAt;
+    return cloneDate(this.props.updatedAt);
   }
 
   public withUpdatedName(displayName: string): User {
-    return User.create({ ...this.props, displayName, updatedAt: new Date() });
+    return User.create({
+      ...this.props,
+      displayName,
+      updatedAt: User.resolveNextTimestamp(this.props.updatedAt),
+    });
   }
 
   public withStatus(status: IUserProps['status']): User {
-    return User.create({ ...this.props, status, updatedAt: new Date() });
+    return User.create({
+      ...this.props,
+      status,
+      updatedAt: User.resolveNextTimestamp(this.props.updatedAt),
+    });
+  }
+
+  private static resolveNextTimestamp(previous: Date): Date {
+    const previousTime = previous.getTime();
+    const now = Date.now();
+    const candidate = now > previousTime ? now : previousTime + 1;
+    return new Date(candidate);
   }
 }

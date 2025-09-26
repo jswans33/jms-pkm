@@ -23,6 +23,8 @@ export default [
       '**/dist/**',
       '**/generated/**',
       'generated/**',
+      '**/.next/**',
+      'prisma/generated/**',
     ],
   },
   js.configs.recommended,
@@ -165,11 +167,29 @@ export default [
       ...jestPlugin.configs.recommended.rules,
       '@typescript-eslint/no-magic-numbers': 'off',
       'max-lines-per-function': 'off',
+      'jest/expect-expect': ['error', {
+        assertFunctionNames: ['expect', 'expectThrowsInvalidId']
+      }],
     },
     settings: {
       jest: {
         version: 30,
       },
+    },
+  },
+  {
+    files: ['prisma/**/*.ts'],
+    languageOptions: {
+      parser: typescriptParser,
+      parserOptions: tsParserOptions,
+    },
+    plugins: {
+      '@typescript-eslint': typescript,
+    },
+    rules: {
+      'no-console': 'off', // Seed scripts need console output
+      '@typescript-eslint/no-magic-numbers': 'off', // Seed data often has magic numbers
+      'max-lines-per-function': 'off', // Seed functions can be longer
     },
   },
   prettier,
